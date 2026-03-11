@@ -1,0 +1,24 @@
+@import "tailwindcss";
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+.flash-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, #026067, #00ffff, #000);
+  animation: neonFlash 3.5s ease-out;
+}
+
+@keyframes neonFlash {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
