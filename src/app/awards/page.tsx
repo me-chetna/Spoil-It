@@ -3,9 +3,9 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 
-import AwardCard from "@/components/AwardCard"
-import Laurel from "@/components/Laurel"
-import AwardWinnerCard from "@/components/AwardWinnerCard"
+import AwardCard from "@/components/awards/AwardCard"
+import Laurel from "@/components/awards/Laurel"
+import AwardWinnerCard from "@/components/awards/AwardWinnerCard"
 
 import { awardCategories } from "@/data/awardCategories"
 import { awardWinners } from "@/data/awardWinner"

@@ -1,8 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+
 import { useAuthStore } from "@/store/auth";
+import ProfileModal from "@/components/ProfileModal";
 
 const links = [
   { name: "Home", href: "/" },
@@ -14,58 +17,70 @@ const links = [
 ];
 
 export default function Navbar() {
-  const router = useRouter()
-  const { isLoggedIn, setLoginModal } = useAuthStore()
-  
+
   const pathname = usePathname();
+  const { isLoggedIn, setLoginModal } = useAuthStore();
+
+  const [openProfile, setOpenProfile] = useState(false);
+
   function handleProfileClick() {
 
     if (!isLoggedIn) {
-      setLoginModal(true)
-      return
+      setLoginModal(true);
+      return;
     }
-    router.push("/profile")
+
+    setOpenProfile(true);
   }
 
   return (
-    <nav className="w-full bg-black flex items-center justify-between px-10 py-4">
+    <>
+      <nav className="w-full bg-black flex items-center justify-between px-10 py-4">
 
-      {/* LEFT SEARCH ICON */}
-      <div className="text-white">
-        <h1 className="text-2xl">Spoil-it</h1>
-      </div>
+        {/* LEFT LOGO */}
+        <div className="text-white">
+          <h1 className="text-2xl font-semibold">Spoil-it</h1>
+        </div>
 
-      {/* CENTER NAV LINKS */}
-      <div className="flex gap-6 items-center">
+        {/* CENTER NAV LINKS */}
+        <div className="flex gap-6 items-center">
 
-        {links.map((link) => {
-          const active = pathname === link.href;
+          {links.map((link) => {
 
-          return (
-            <Link
-              key={link.name}
-              href={link.href}
-              className={`px-5 py-2 rounded-full transition
-                
-              ${
-                active
-                  ? "bg-white text-black"
-                  : "text-white hover:bg-white/10"
-              }`}
-            >
-              {link.name}
-            </Link>
-          );
-        })}
-      </div>
+            const active = pathname === link.href;
 
-      {/* PROFILE BUTTON */}
-      <button 
-        onClick={handleProfileClick}
-        className="px-5 py-2 border border-white rounded-full hover:bg-white hover:text-black transition cursor-pointer"
-      >
-        Profile
-      </button>
-    </nav>
+            return (
+              <Link
+                key={link.name}
+                href={link.href}
+                className={`px-5 py-2 rounded-full transition
+                ${
+                  active
+                    ? "bg-white text-black"
+                    : "text-white hover:bg-white/10"
+                }`}
+              >
+                {link.name}
+              </Link>
+            );
+          })}
+
+        </div>
+
+        {/* PROFILE BUTTON */}
+        <button
+          onClick={handleProfileClick}
+          className="px-5 py-2 border border-white text-white rounded-full hover:bg-white hover:text-black transition cursor-pointer"
+        >
+          Profile
+        </button>
+
+      </nav>
+
+      {/* PROFILE MODAL */}
+      {openProfile && (
+        <ProfileModal onClose={() => setOpenProfile(false)} />
+      )}
+    </>
   );
 }

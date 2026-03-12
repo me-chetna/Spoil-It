@@ -1,5 +1,5 @@
-import left from "@/images/left.jpg"
-import right from "@/images/right.jpg"
+import left from "@/images/left.png"
+import right from "@/images/right.png"
 
 interface Props {
   title: string
