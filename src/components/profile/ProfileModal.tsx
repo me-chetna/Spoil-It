@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import AvatarModal from "@/components/AvatarModal"
+import AvatarModal from "@/components/profile/AvatarModal"
 
 export default function ProfileModal({ onClose }: { onClose: () => void }) {
 

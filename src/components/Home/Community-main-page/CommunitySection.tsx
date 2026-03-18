@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import SearchBar from "@/components/SearchBar";
+import SearchBar from "@/components/Home/Community-main-page/SearchBar";
 import CommunityCarousel from "./CommunityCarousel";
 
 const reviews = [

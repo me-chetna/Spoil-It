@@ -1,9 +1,9 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/navbar/navbar";
 import { Holtwood_One_SC } from "next/font/google";
 import Footer from "@/components/Footer";
-import Login from "@/components/Login";
+import Login from "@/components/navbar/Login";
 
 const holtwood = Holtwood_One_SC({
   subsets: ["latin"],
