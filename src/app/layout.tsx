@@ -1,45 +1,40 @@
+"use client";
+
 import "./globals.css";
-import { Inter } from "next/font/google";
+import { Inter, Holtwood_One_SC } from "next/font/google";
+import { SessionProvider } from "next-auth/react";
+import useSessionSync from "@/hooks/useSessionSync";
 import Navbar from "@/components/navbar/navbar";
-import { Holtwood_One_SC } from "next/font/google";
 import Footer from "@/components/Footer";
 import Login from "@/components/navbar/Login";
 
-const holtwood = Holtwood_One_SC({
-  subsets: ["latin"],
-  weight: "400",
-});
-
 const inter = Inter({
   subsets: ["latin"],
-  weight: ["400","500","700"],
+  weight: ["400", "500", "700"],
 });
 
-export const metadata = {
-  title: "Spoil-it",
-  description: "Discover anime, dramas, movies and series.",
-};
+function AppContent({ children }: any) {
+  useSessionSync();
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+  return (
+    <>
+      <Navbar />
+      <main className="min-h-screen">{children}</main>
+      <Login />
+      <Footer />
+    </>
+  );
+}
+
+export default function RootLayout({ children }: any) {
   return (
     <html lang="en">
       <body className={`${inter.className} bg-black text-white`}>
 
-        {/* NAVBAR */}
-        <Navbar />
+        <SessionProvider>
+          <AppContent>{children}</AppContent>
+        </SessionProvider>
 
-        {/* PAGE CONTENT */}
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <Login />
-
-        {/* FOOTER */}
-        <Footer />
       </body>
     </html>
   );

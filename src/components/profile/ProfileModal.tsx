@@ -1,15 +1,25 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import AvatarModal from "@/components/profile/AvatarModal"
+import { useAuthStore } from "@/store/useAuthStore"
+import { avatars } from '../../data/avatars';
 
 export default function ProfileModal({ onClose }: { onClose: () => void }) {
 
-  const [avatar, setAvatar] = useState<string | null>(null)
-  const [openAvatarModal, setOpenAvatarModal] = useState(false)
+  const  user  = useAuthStore((state) => state.user)
+
+  const [avatar, setAvatar] = useState<string | null>(null) // To store the avatar URL
+  const [openAvatarModal, setOpenAvatarModal] = useState(false) //To open the avatar dialogue box
+
+  // 🔥 Set avatar from logged-in user
+  useEffect(() => {
+    if (user?.image) {
+      setAvatar(user.image)
+    }
+  }, [user])
 
   return (
-
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
 
       {/* Profile Card */}
@@ -25,47 +35,40 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
 
         {/* Avatar */}
         <div className="flex justify-center mb-8">
-
           <div
             onClick={() => setOpenAvatarModal(true)}
-            className="w-40 h-40 rounded-full bg-gray-300 overflow-hidden cursor-pointer hover:scale-105 transition"
+            className="w-40 h-40 rounded-full bg-gray-300 overflow-hidden cursor-pointer hover:scale-105 transition flex items-center justify-center"
           >
-
-            {avatar && (
+            {avatar ? (
               <img
-                src={avatar}
+                src={user?.avatar || user?.image}
                 className="w-full h-full object-cover"
               />
+            ) : (
+              <span className="text-black">No Image</span>
             )}
-
           </div>
-
         </div>
 
         {/* Profile Info */}
-
         <div className="space-y-6">
 
           <div>
-            <h3 className="text-lg font-semibold">Name</h3>
-            <p className="text-gray-400">Type your Name</p>
+            <h3 className="text-lg font-semibold">{user?.name || "No name"}</h3>
+            <p className="text-gray-400">
+              {user?.email || "No email"}
+            </p>
           </div>
 
           <div>
             <h3 className="text-lg font-semibold">Spoil-Coins</h3>
-            <p>10,000</p>
+            <p>50</p> {/* 🔥 later from DB */}
           </div>
 
           <div>
             <h3 className="text-lg font-semibold">Total series Liked</h3>
-            <p>10</p>
+            <p>0</p> {/* 🔥 later dynamic */}
           </div>
-
-          <div>
-            <h3 className="text-lg font-semibold">Email</h3>
-            <p>abcd@gmail.com</p>
-          </div>
-
         </div>
 
       </div>

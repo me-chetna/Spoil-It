@@ -4,10 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-import { useAuthStore } from "@/store/auth";
+import { useAuthStore } from "@/store/useAuthStore";
 import ProfileModal from "@/components/profile/ProfileModal";
 import WatchlistModal from "@/components/navbar/WatchlistModal";
 import PostReviewModal from "@/components/navbar/PostReviewModal";
+import { signOut } from "next-auth/react";
 
 const links = [
   { name: "Home", href: "/" },
@@ -20,7 +21,8 @@ const links = [
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { isLoggedIn, setLoginModal } = useAuthStore();
+  const user = useAuthStore((state) => state.user);
+  const setLoginModal = useAuthStore((state) => state.setLoginModal);
 
   const [openProfile, setOpenProfile] = useState(false);
   const [dropdown, setDropdown] = useState(false);
@@ -29,10 +31,13 @@ export default function Navbar() {
   const [openReview, setOpenReview] = useState(false);
 
   function handleProfileClick() {
-    if (!isLoggedIn) {
+    if (!user) {
       setLoginModal(true);
       return;
     }
+
+    setOpenProfile(true);
+    console.log("clicked", user);
   }
 
   return (
@@ -97,6 +102,7 @@ export default function Navbar() {
             </button>
 
             <button
+              onClick={() => {signOut()}}
               className="w-full text-left px-4 py-3 text-white hover:bg-red-500 hover:text-white transition"
             >
               Sign Out
