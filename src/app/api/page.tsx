@@ -1,27 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import HeroCategories from "@/components/Home/Main Carousel/HeroCategories";
-import HorizontalCarousel from "@/components/Home/card-carousel/Horizontalcarousel";
-import CommunitySection from "@/components/Home/Community-main-page/CommunitySection";
-import ExclusiveStory from "@/components/Home/Exclusive-Story/ExclusiveStory";
+import ContentCarousel from "@/components/Home/card-carousel/Horizontalcarousel";
 import { Content } from "@/types/content";
 
 export default function Home() {
-  const [trending, setTrending] = useState<Content[]>([]);
   const [topRated, setTopRated] = useState<Content[]>([]);
   const [popular, setPopular] = useState<Content[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [trendRes, topRes, popRes] = await Promise.all([
-          fetch("/api/tmdb/trending"),
-          fetch("/api/tmdb/topRated"),
+        const [topRes, popRes] = await Promise.all([
+          fetch("/api/tmdb/top-rated"),
           fetch("/api/tmdb/popular"),
         ]);
 
-        const trendData = await trendRes.json();
         const topData = await topRes.json();
         const popData = await popRes.json();
 
@@ -38,7 +32,6 @@ export default function Home() {
               : "N/A",
           }));
 
-        setTrending(mapData(trendData.results));
         setTopRated(mapData(topData.results));
         setPopular(mapData(popData.results));
 
@@ -51,40 +44,33 @@ export default function Home() {
   }, []);
 
   // ✅ Loading state
-  if (!trending.length || !topRated.length || !popular.length) {
-    return <div className="text-center mt-20">Loading...</div>;
+  if (!topRated.length || !popular.length) {
+    return (
+      <div className="text-white text-center mt-20">
+        Loading...
+      </div>
+    );
   }
 
   return (
-    <main>
-      <HeroCategories />
+    <div>
 
       {/* ⭐ Top Rated */}
-      <HorizontalCarousel
-        title="Top Rated"
+      <ContentCarousel
+        title="⭐ Top Rated"
         items={topRated}
-        color="white"
-        bgColor="black"
-      />
-
-      {/* 🔥 Trending */}
-      <HorizontalCarousel
-        title="Trending Now"
-        items={trending}
         color="black"
-        bgColor="white"
+        bgColor="#f5f5f5"
       />
 
       {/* 🆕 Fresh Arrivals */}
-      <HorizontalCarousel
-        title="Fresh Arrivals"
+      <ContentCarousel
+        title="🆕 Fresh Arrivals"
         items={popular}
         color="white"
-        bgColor="black"
+        bgColor="#111"
       />
 
-      <CommunitySection />
-      <ExclusiveStory />
-    </main>
+    </div>
   );
 }

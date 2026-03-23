@@ -8,14 +8,19 @@ import { Content } from "@/types/content";
 interface Props {
   title: string;
   items: Content[];
-  color : string;
-  bgColor : string;
+  color: string;
+  bgColor: string;
 }
 
-export default function ContentCarousel({ title, items, color, bgColor}: Props) {
-
+export default function ContentCarousel({
+  title,
+  items,
+  color,
+  bgColor,
+}: Props) {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
+    dragFree: true, // smoother UX
   });
 
   const scrollPrev = useCallback(() => {
@@ -26,42 +31,67 @@ export default function ContentCarousel({ title, items, color, bgColor}: Props) 
     emblaApi?.scrollNext();
   }, [emblaApi]);
 
-  return (
-    <div className="w-full py-10" style={{backgroundColor: bgColor}}>
+  // ✅ Prevent rendering empty / undefined data
+  if (!items || items.length === 0) {
+    return null;
+  }
 
-      <h2 className="text-3xl font-bold text-center mb-8" style={{color: color}}>
+  return (
+    <div className="w-full py-10" style={{ backgroundColor: bgColor }}>
+      
+      <h2
+        className="text-3xl font-bold text-center mb-8"
+        style={{ color }}
+      >
         {title}
       </h2>
 
       <div className="flex items-center gap-4 px-10">
 
-        <button onClick={scrollPrev} className="text-3xl font-bold" style={{color: color}}>
+        {/* LEFT BUTTON */}
+        <button
+          onClick={scrollPrev}
+          className="text-3xl font-bold hover:scale-110 transition"
+          style={{ color }}
+        >
           {"<"}
         </button>
 
+        {/* CAROUSEL */}
         <div className="overflow-hidden w-full" ref={emblaRef}>
-
           <div className="flex gap-6">
 
-            {items.map((item) => (
-              <div
-                key={item.id}
-                className="flex-[0_0_calc(100%/6)]"
-              >
-                <ContentCard item={item} color={color} />
-              </div>
-            ))}
+            {items.map((item) => {
+              // ✅ SAFETY LAYER (VERY IMPORTANT)
+              const safeItem = {
+                ...item,
+                title: item.title || "Untitled",
+                poster: item.poster || "/fallback.jpg",
+              };
+
+              return (
+                <div
+                  key={item.id}
+                  className="flex-[0_0_calc(100%/6)]"
+                >
+                  <ContentCard item={safeItem} color={color} />
+                </div>
+              );
+            })}
 
           </div>
-
         </div>
 
-        <button onClick={scrollNext} className="text-3xl font-bold" style={{color: color}}>
+        {/* RIGHT BUTTON */}
+        <button
+          onClick={scrollNext}
+          className="text-3xl font-bold hover:scale-110 transition"
+          style={{ color }}
+        >
           {">"}
         </button>
 
       </div>
-
     </div>
   );
 }

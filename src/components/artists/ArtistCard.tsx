@@ -49,7 +49,7 @@ export default function ArtistCard({
       </h3>
 
       <div className="text-xs text-gray-300 text-center">
-        <p>Age: {age}</p>
+        <p>Popularity: {age}</p>
         <p>{birthday}</p>
       </div>
 

@@ -21,13 +21,7 @@ export default function ContentCard({ item, color }: Props) {
 
         {/* Episode / Season badge */}
         <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
-
-          {item.type === "movie"
-            ? "M1"
-            : item.seasons
-            ? `S${item.seasons}`
-            : `E${item.episodes}`}
-
+          {item.type === "movie" ? "M1" : "TV"}
         </div>
 
       </div>
@@ -39,7 +33,7 @@ export default function ContentCard({ item, color }: Props) {
 
       {/* WATCH COUNT */}
       <p className="text-xs text-gray-700">
-        Watch : {item.watchCount}
+        Ratings : {item.watchCount}
       </p>
 
     </div>

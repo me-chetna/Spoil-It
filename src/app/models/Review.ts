@@ -1,16 +1,11 @@
 import mongoose from "mongoose";
 
-const reviewSchema = new mongoose.Schema({
-  userId: String,
-  contentId: String,
+const ReviewSchema = new mongoose.Schema({
   title: String,
   review: String,
+  user: String,
   rating: Number,
+}, { timestamps: true });
 
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
-
-export default mongoose.models.Review || mongoose.model("Review", reviewSchema);
+export default mongoose.models.Review ||
+  mongoose.model("Review", ReviewSchema);

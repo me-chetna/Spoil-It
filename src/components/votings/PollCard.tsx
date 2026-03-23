@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Poll } from "@/types/poll"
 import PollOption from "@/components/votings/PollOption"
-import { useAuthStore } from "@/store/auth"
+import { useAuthStore } from "@/store/useAuthStore"
 
 interface Props {
   poll: Poll

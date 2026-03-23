@@ -13,7 +13,7 @@ export default function ReviewCard({ title, review, user, rating }: Props) {
       {/* Review body */}
       <div className="p-4">
 
-        <h3 className="font-semibold text-center mb-2">
+        <h3 className="font-semibold text-center mb-2 text-black">
           {title}
         </h3>
 

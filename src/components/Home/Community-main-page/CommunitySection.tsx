@@ -1,69 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchBar from "@/components/Home/Community-main-page/SearchBar";
 import CommunityCarousel from "./CommunityCarousel";
 
-const reviews = [
-  {
-    title: "Queen of Tears",
-    review: "Queen of Tears is widely considered worth watching...",
-    user: "Crazyme",
-    rating: 9,
-  },
-  {
-    title: "Solo Levelling",
-    review: "Solo Leveling is a masterpiece...",
-    user: "Crazyme",
-    rating: 11,
-  },
-  {
-    title: "YJHD",
-    review: "Yeh Jawaani Hai Deewani blends love and adventure.",
-    user: "Crazyme",
-    rating: 8.5,
-  },
-  {
-    title: "TSITP",
-    review: "The Summer I Turned Pretty was different.",
-    user: "Crazyme",
-    rating: 5,
-  },
-  {
-    title: "Queen of Tears",
-    review: "Queen of Tears is widely considered worth watching...",
-    user: "Crazyme",
-    rating: 9,
-  },
-  {
-    title: "Solo Levelling",
-    review: "Solo Leveling is a masterpiece...",
-    user: "Crazyme",
-    rating: 11,
-  },
-  {
-    title: "YJHD",
-    review: "Yeh Jawaani Hai Deewani blends love and adventure.",
-    user: "Crazyme",
-    rating: 8.5,
-  },
-  {
-    title: "TSITP",
-    review: "The Summer I Turned Pretty was different.",
-    user: "Crazyme",
-    rating: 5,
-  },
-];
+interface Review {
+  title: string;
+  review: string;
+  user: string;
+  rating: number;
+}
 
 export default function CommunitySection() {
-
   const [query, setQuery] = useState("");
+  const [reviews, setReviews] = useState<Review[]>([]);
 
+  // ✅ Fetch from backend
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const res = await fetch("/api/reviews");
+        const data = await res.json();
+
+        setReviews(data.reviews); // 🔥 IMPORTANT
+      } catch (err) {
+        console.error("Error fetching reviews:", err);
+      }
+    };
+
+    fetchReviews();
+  }, []);
+
+  // ✅ Filter logic
   const filtered = reviews.filter(
     (item) =>
       item.title.toLowerCase().includes(query.toLowerCase()) ||
       item.user.toLowerCase().includes(query.toLowerCase())
   );
+
+  // ✅ Loading state
+  if (!reviews.length) {
+    return <div className="text-center mt-10">Loading community...</div>;
+  }
 
   return (
     <div className="bg-white py-12">
