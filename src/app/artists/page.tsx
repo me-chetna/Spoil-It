@@ -10,7 +10,23 @@ export default function ArtistsPage() {
   const [selectedArtist, setSelectedArtist] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Fetch ONLY popular artists (NO extra API calls)
+  // 🔍 Search states
+  const [search, setSearch] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  // 📅 Format date
+  function formatDate(dateString: string) {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
+
+  // ✅ Fetch top artists
   useEffect(() => {
     const fetchArtists = async () => {
       try {
@@ -19,7 +35,6 @@ export default function ArtistsPage() {
 
         const top = data.results.slice(0, 32);
 
-        // ✅ fetch birthdays in parallel (optimized)
         const detailed = await Promise.all(
           top.map(async (a: any, i: number) => {
             try {
@@ -29,16 +44,11 @@ export default function ArtistsPage() {
               return {
                 id: a.id,
                 name: a.name,
-
                 age: a.popularity?.toFixed(1) || "N/A",
-
-                // ✅ NOW REAL BIRTHDAY
-                birthday: formatDate(full.person.birthday), 
-
+                birthday: formatDate(full.person.birthday),
                 image: a.profile_path
                   ? `https://image.tmdb.org/t/p/w500${a.profile_path}`
                   : "/fallback.jpg",
-
                 rank: `#${i + 1}`,
               };
             } catch {
@@ -65,19 +75,42 @@ export default function ArtistsPage() {
 
     fetchArtists();
   }, []);
-    function formatDate(dateString: string) {
-    if (!dateString) return "N/A";
 
-    const date = new Date(dateString);
+  // 🔍 Handle search
+  const handleSearch = async (query: string) => {
+    setSearch(query);
 
-    return date.toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  }
+    if (!query) {
+      setIsSearching(false);
+      setSearchResults([]);
+      return;
+    }
 
-  // ✅ Fetch FULL data ONLY when clicked
+    try {
+      setIsSearching(true);
+
+      const res = await fetch(`/api/tmdb/person/search?query=${query}`);
+      const data = await res.json();
+
+      const mapped = data.results.slice(0, 32).map((a: any, i: number) => ({
+        id: a.id,
+        name: a.name,
+        age: a.popularity?.toFixed(1) || "N/A",
+        birthday: "N/A",
+        image: a.profile_path
+          ? `https://image.tmdb.org/t/p/w500${a.profile_path}`
+          : "/fallback.jpg",
+        rank: `#${i + 1}`,
+      }));
+
+      setSearchResults(mapped);
+
+    } catch (err) {
+      console.error("Search error:", err);
+    }
+  };
+
+  // 🎬 Open modal
   const openArtist = async (artist: any) => {
     try {
       const res = await fetch(`/api/tmdb/person/${artist.id}`);
@@ -88,12 +121,9 @@ export default function ArtistsPage() {
         image: data.person.profile_path
           ? `https://image.tmdb.org/t/p/w500${data.person.profile_path}`
           : "/fallback.jpg",
-
-        age : data.person.popularity?.toFixed(1) || "N/A",
-
+        age: data.person.popularity?.toFixed(1) || "N/A",
         birthday: formatDate(data.person.birthday),
-        bio : data.person.biography || "No biography available.",
-
+        bio: data.person.biography || "No biography available.",
         works: data.credits.cast.slice(0, 8).map((w: any) => ({
           title: w.title || w.name,
           poster: w.poster_path
@@ -110,19 +140,28 @@ export default function ArtistsPage() {
   return (
     <div className="bg-black min-h-screen text-white p-10">
 
-      {/* Title */}
       <h1 className="text-3xl font-bold text-center mb-10">
         Top Artists
       </h1>
 
-      {/* ✅ Loading */}
+      {/* 🔍 Search Bar */}
+      <div className="flex justify-center mb-10">
+        <input
+          type="text"
+          placeholder="Search artists..."
+          value={search}
+          onChange={(e) => handleSearch(e.target.value)}
+          className="w-96 px-5 py-2 rounded-full bg-black border border-white text-white outline-none"
+        />
+      </div>
+
+      {/* Loading */}
       {loading ? (
         <div className="text-center mt-20">Loading artists...</div>
       ) : (
-
         <div className="grid grid-cols-4 gap-8">
 
-          {artists.map((artist) => (
+          {(isSearching ? searchResults : artists).map((artist) => (
             <ArtistCard
               key={artist.id}
               {...artist}
@@ -131,7 +170,13 @@ export default function ArtistsPage() {
           ))}
 
         </div>
+      )}
 
+      {/* No results */}
+      {isSearching && searchResults.length === 0 && (
+        <div className="text-center mt-10 text-gray-400">
+          No artists found
+        </div>
       )}
 
       {/* Modal */}
