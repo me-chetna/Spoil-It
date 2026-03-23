@@ -151,7 +151,7 @@ export default function ArtistsPage() {
           placeholder="Search artists..."
           value={search}
           onChange={(e) => handleSearch(e.target.value)}
-          className="w-96 px-5 py-2 rounded-full bg-black border border-white text-white outline-none"
+          className="w-96 px-10 py-2 rounded-full bg-black border border-white text-white outline-none"
         />
       </div>
 

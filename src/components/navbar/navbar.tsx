@@ -13,7 +13,6 @@ import { signOut } from "next-auth/react";
 const links = [
   { name: "Home", href: "/" },
   { name: "Artists", href: "/artists" },
-  { name: "Awards", href: "/awards" },
   { name: "Community", href: "/community" },
   { name: "News", href: "/news" },
   { name: "Votings", href: "/votings" },
