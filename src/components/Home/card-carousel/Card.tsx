@@ -5,11 +5,13 @@ import { Content } from "@/types/content";
 interface Props {
   item: Content;
   color?: string;
+  onClick?: () => void;
 }
 
-export default function ContentCard({ item, color }: Props) {
+
+export default function ContentCard({ item, color, onClick }: Props) {
   return (
-    <div className="cursor-pointer">
+    <div className="cursor-pointer" onClick={onClick}>
 
       {/* IMAGE */}
       <div className="relative group overflow-hidden rounded-md">
@@ -31,7 +33,7 @@ export default function ContentCard({ item, color }: Props) {
         {item.title}
       </h3>
 
-      {/* WATCH COUNT */}
+      {/* Ratings */}
       <p className="text-xs text-gray-700">
         Ratings : {item.watchCount}
       </p>

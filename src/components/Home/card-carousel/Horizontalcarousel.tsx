@@ -1,7 +1,7 @@
 "use client";
 
 import useEmblaCarousel from "embla-carousel-react";
-import { useCallback } from "react";
+import { useCallback, useState} from "react";
 import ContentCard from "./Card";
 import { Content } from "@/types/content";
 
@@ -35,7 +35,40 @@ export default function ContentCarousel({
   if (!items || items.length === 0) {
     return null;
   }
+  const [selectedMovie, setSelectedMovie] = useState<any>(null);
 
+  const openMovie = async (item: any) => {
+    try {
+      const type = item.type === "tv" ? "tv" : "movie";
+
+      const res = await fetch(`/api/tmdb/${type}/${item.id}`);
+      const data = await res.json();
+
+      if (!data.details) {
+        console.error("Invalid movie data", data);
+        return;
+      }
+
+      setSelectedMovie({
+        title: data.details.title || data.details.name,
+        overview: data.details.overview,
+
+        backdrop: data.details.backdrop_path
+          ? `https://image.tmdb.org/t/p/original${data.details.backdrop_path}`
+          : "/fallback.jpg",
+
+        genres: data.details.genres || [],
+
+        providers:
+          data.providers?.results?.US?.flatrate || [],
+
+        cast: data.credits?.cast?.slice(0, 8) || [],
+      });
+
+    } catch (err) {
+      console.error("Movie fetch error:", err);
+    }
+  };
   return (
     <div className="w-full py-10" style={{ backgroundColor: bgColor }}>
       
@@ -74,7 +107,7 @@ export default function ContentCarousel({
                   key={item.id}
                   className="flex-[0_0_calc(100%/6)]"
                 >
-                  <ContentCard item={safeItem} color={color} />
+                  <ContentCard item={safeItem} color={color} onClick={() => openMovie(item)} />
                 </div>
               );
             })}

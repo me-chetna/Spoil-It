@@ -6,6 +6,7 @@ import HorizontalCarousel from "@/components/Home/card-carousel/Horizontalcarous
 import CommunitySection from "@/components/Home/Community-main-page/CommunitySection";
 import ExclusiveStory from "@/components/Home/Exclusive-Story/ExclusiveStory";
 import { Content } from "@/types/content";
+import HeroSearch from "@/components/Home/Search/HomeSearch";
 
 export default function Home() {
   const [trending, setTrending] = useState<Content[]>([]);
@@ -58,6 +59,9 @@ export default function Home() {
   return (
     <main>
       <HeroCategories />
+
+      {/* SEARCH */}
+      <HeroSearch />
 
       {/* ⭐ Top Rated */}
       <HorizontalCarousel
