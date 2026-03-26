@@ -1,22 +1,39 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useAuthStore } from "@/store/useAuthStore";
+
 interface Props {
   onClose: () => void;
 }
 
-const watchlist = [
-  { id: 1, title: "Queen of Tears", poster: "/queen.jpg", rating: 9.5 },
-  { id: 2, title: "Attack on Titan", poster: "/aot.jpg", rating: 9.8 },
-  { id: 3, title: "Interstellar", poster: "/interstellar.jpg", rating: 9.2 },
-  { id: 4, title: "Interstellar", poster: "/interstellar.jpg", rating: 9.2 },
-  { id: 5, title: "Interstellar", poster: "/interstellar.jpg", rating: 9.2 },
-  { id: 6, title: "Interstellar", poster: "/interstellar.jpg", rating: 9.2 },
-  { id: 7, title: "Interstellar", poster: "/interstellar.jpg", rating: 9.2 },
-  { id: 8, title: "Interstellar", poster: "/interstellar.jpg", rating: 9.2 },
-  { id: 9, title: "Interstellar", poster: "/interstellar.jpg", rating: 9.2 },
-];
-
 export default function WatchlistModal({ onClose }: Props) {
+  const user = useAuthStore((state) => state.user);
+  const [items, setItems] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!user?.email) return;
+
+    fetch(`/api/watchlist?userId=${user.email}`)
+      .then((res) => res.json())
+      .then((data) => setItems(data));
+  }, [user]);
+
+  // 🔥 DELETE FUNCTION
+  const removeFromWatchlist = async (movieId: number) => {
+    await fetch("/api/watchlist", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: user?.email,
+        movieId,
+      }),
+    });
+
+    // ✅ instant UI update
+    setItems((prev) => prev.filter((m) => m.movieId !== movieId));
+  };
+
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
 
@@ -36,44 +53,43 @@ export default function WatchlistModal({ onClose }: Props) {
           </button>
         </div>
 
-        {/* SCROLLABLE AREA */}
+        {/* SCROLL */}
         <div className="max-h-[60vh] overflow-y-auto pr-2">
 
-          {/* MOVIES GRID */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {items.length === 0 ? (
+            <p className="text-gray-400 text-center">
+              No items in watchlist
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
 
-            {watchlist.map((movie) => {
+              {items.map((movie) => (
+                <div key={movie._id} className="relative">
 
-              const topRated = movie.rating >= 9.5;
-
-              return (
-                <div
-                  key={movie.id}
-                  className={`rounded-xl p-[2px] ${
-                    topRated
-                      ? "bg-gradient-to-r from-pink-500 to-purple-500"
-                      : "bg-transparent"
-                  }`}
-                >
+                  {/* ❌ DELETE BUTTON */}
+                  <button
+                    onClick={() => removeFromWatchlist(movie.movieId)}
+                    className="absolute top-1 right-1 bg-black/70 rounded-full px-2 text-white hover:text-red-400"
+                  >
+                    ✕
+                  </button>
 
                   <div className="bg-black rounded-xl p-2">
-
                     <img
-                      src={movie.poster}
+                      src={`https://image.tmdb.org/t/p/w500${movie.poster}`}
                       className="rounded-lg h-[180px] w-full object-cover"
                     />
 
                     <p className="text-white text-sm mt-2 text-center">
                       {movie.title}
                     </p>
-
                   </div>
 
                 </div>
-              );
-            })}
+              ))}
 
-          </div>
+            </div>
+          )}
 
         </div>
 

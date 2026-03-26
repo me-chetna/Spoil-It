@@ -4,6 +4,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useState} from "react";
 import ContentCard from "./Card";
 import { Content } from "@/types/content";
+import MovieModal from "../movie/MovieModal";
 
 interface Props {
   title: string;
@@ -41,21 +42,25 @@ export default function ContentCarousel({
     try {
       const type = item.type === "tv" ? "tv" : "movie";
 
-      const res = await fetch(`/api/tmdb/${type}/${item.id}`);
+      // ✅ FIXED API PATH
+      const res = await fetch(`/api/tmdb/movie/${item.id}?type=${type}`);
       const data = await res.json();
 
+      if (!res.ok) {
+        throw new Error("API failed");
+      }
+      
       if (!data.details) {
         console.error("Invalid movie data", data);
         return;
       }
 
       setSelectedMovie({
+        ...data.details,
         title: data.details.title || data.details.name,
         overview: data.details.overview,
 
-        backdrop: data.details.backdrop_path
-          ? `https://image.tmdb.org/t/p/original${data.details.backdrop_path}`
-          : "/fallback.jpg",
+        backdrop: data.details.backdrop_path,
 
         genres: data.details.genres || [],
 
@@ -123,6 +128,12 @@ export default function ContentCarousel({
         >
           {">"}
         </button>
+        {selectedMovie && (
+          <MovieModal
+            movie={selectedMovie}
+            onClose={() => setSelectedMovie(null)}
+          />
+        )}
 
       </div>
     </div>

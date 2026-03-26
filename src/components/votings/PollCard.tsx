@@ -1,47 +1,84 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Poll } from "@/types/poll"
-import PollOption from "@/components/votings/PollOption"
-import { useAuthStore } from "@/store/useAuthStore"
+import { useState } from "react";
+import { Poll } from "@/types/poll";
+import PollOption from "@/components/votings/PollOption";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface Props {
-  poll: Poll
+  poll: Poll;
 }
 
 export default function PollCard({ poll }: Props) {
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [showResults, setShowResults] = useState(false);
+  const [localOptions, setLocalOptions] = useState(poll.options);
 
-  const [selectedOption, setSelectedOption] = useState<string | null>(null)
-  const [showResults, setShowResults] = useState(false)
-  const { isLoggedIn, setLoginModal } = useAuthStore()
+  const { user, setLoginModal, updateCoins } = useAuthStore();
 
-  const totalVotes = poll.options.reduce(
+  const totalVotes = localOptions.reduce(
     (sum, o) => sum + o.votes,
     0
-  )
+  );
 
-  function handleVote(optionId: string) {
-    if (!isLoggedIn) {
-        setLoginModal(true)
-        return
+  async function handleVote(optionId: string) {
+    if (!user) {
+      setLoginModal(true);
+      return;
     }
 
-    if (selectedOption) return
+    if (selectedOption) return;
 
-    // later -> POST /api/vote
+    try {
+      const res = await fetch("/api/vote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          pollId: poll._id,
+          optionId,
+        }),
+      });
 
-    setSelectedOption(optionId)
-    setShowResults(true)
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error);
+        return;
+      }
+
+      // ✅ update UI state
+      setSelectedOption(optionId);
+      setShowResults(true);
+
+      // ✅ update votes locally (instant feedback)
+      setLocalOptions((prev) =>
+        prev.map((o) =>
+          o.id === optionId
+            ? { ...o, votes: o.votes + 1 }
+            : o
+        )
+      );
+
+      // 🔥 temporary feedback (later connect to global store)
+      updateCoins(data.coins);
+
+    } catch (err) {
+      console.error("Vote error:", err);
+    }
   }
 
   return (
     <div className="bg-gray-800 rounded-xl p-5">
 
+      {/* TITLE */}
       <h2 className="text-lg font-semibold mb-4">
         {poll.title}
       </h2>
 
-      {poll.options.map(option => (
+      {/* OPTIONS */}
+      {localOptions.map((option) => (
         <PollOption
           key={option.id}
           option={option}
@@ -53,6 +90,7 @@ export default function PollCard({ poll }: Props) {
         />
       ))}
 
+      {/* INFO */}
       {!showResults && (
         <p className="text-xs text-gray-400 mt-3">
           Voting costs {poll.cost} Spoil Coins
@@ -64,7 +102,6 @@ export default function PollCard({ poll }: Props) {
           Vote locked ✔
         </p>
       )}
-
     </div>
-  )
+  );
 }

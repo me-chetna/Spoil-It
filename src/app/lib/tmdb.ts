@@ -1,19 +1,16 @@
-const API_KEY = process.env.TMDB_API_KEY;
-const BASE_URL = process.env.TMDB_BASE_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_TMDB_PROXY_URL;
 
 export async function fetchFromTMDB(endpoint: string) {
-  const separator = endpoint.includes("?") ? "&" : "?";
+  const url = `${BASE_URL}/api/tmdb${endpoint}`;
 
-  const url = `${BASE_URL}${endpoint}${separator}api_key=${API_KEY}&language=en-US`;
-
-  console.log("TMDB URL:", url); // 👈 DEBUG
+  console.log("PROXY URL:", url); // ✅ debug
 
   const res = await fetch(url);
 
   if (!res.ok) {
     const errorText = await res.text();
-    console.log("TMDB ERROR:", errorText);
-    throw new Error("TMDB fetch failed");
+    console.log("TMDB PROXY ERROR:", errorText);
+    throw new Error("TMDB proxy fetch failed");
   }
 
   return res.json();

@@ -3,16 +3,32 @@ import { fetchFromTMDB } from "@/app/lib/tmdb";
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> } // ✅ FIX
 ) {
   try {
-    const id = params.id;
+    const { id } = await context.params; // ✅ MUST await
 
-    const [details, credits, providers] = await Promise.all([
-      fetchFromTMDB(`/movie/${id}`),                 // ✅ FIXED
-      fetchFromTMDB(`/movie/${id}/credits`),        // ✅ FIXED
-      fetchFromTMDB(`/movie/${id}/watch/providers`) // ✅ FIXED
-    ]);
+    const { searchParams } = new URL(req.url);
+    const type = searchParams.get("type") || "movie";
+
+    console.log("Movie:", id, type);
+
+    const details = await fetchFromTMDB(`/${type}/${id}`);
+
+    let credits = { cast: [] };
+    let providers = {};
+
+    try {
+      credits = await fetchFromTMDB(`/${type}/${id}/credits`);
+    } catch (err) {
+      console.log("Credits failed");
+    }
+
+    try {
+      providers = await fetchFromTMDB(`/${type}/${id}/watch/providers`);
+    } catch (err) {
+      console.log("Providers failed");
+    }
 
     return NextResponse.json({
       details,
@@ -22,6 +38,7 @@ export async function GET(
 
   } catch (err) {
     console.error("MOVIE API ERROR:", err);
+
     return NextResponse.json(
       { error: "Failed to fetch movie" },
       { status: 500 }

@@ -24,7 +24,6 @@ export default function Navbar() {
   const setLoginModal = useAuthStore((state) => state.setLoginModal);
 
   const [openProfile, setOpenProfile] = useState(false);
-  const [dropdown, setDropdown] = useState(false);
 
   const [openWatchlist, setOpenWatchlist] = useState(false);
   const [openReview, setOpenReview] = useState(false);

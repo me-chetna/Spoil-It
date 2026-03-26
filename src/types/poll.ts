@@ -6,7 +6,7 @@ export interface PollOption {
 }
 
 export interface Poll {
-  id: string
+  _id: string
   title: string
   cost: number // coins required
   options: PollOption[]

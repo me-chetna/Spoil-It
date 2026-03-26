@@ -1,11 +1,56 @@
 "use client";
 
+import { useState } from "react";
+import { useAuthStore } from "@/store/useAuthStore";
+
 interface Props {
   movie: any;
   onClose: () => void;
 }
 
 export default function MovieModal({ movie, onClose }: Props) {
+  const user = useAuthStore((state) => state.user);
+  const [added, setAdded] = useState(false);
+
+  const handleWatchlist = async () => {
+    if (!user?.email) {
+      alert("Login first");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/watchlist", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.email,
+          movie: {
+            id: movie.id,
+            title: movie.title,
+            poster: movie.poster_path || "",
+          },
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.error === "Already added") {
+        alert("Already in watchlist ⚠️");
+        setAdded(true);
+      } else if (res.ok) {
+        alert("Added to watchlist ✅");
+        setAdded(true);
+      } else {
+        alert(data.error || "Something went wrong");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error adding to watchlist");
+    }
+  };
+
   if (!movie) return null;
 
   return (
@@ -23,7 +68,11 @@ export default function MovieModal({ movie, onClose }: Props) {
 
         {/* BACKDROP */}
         <img
-          src={`https://image.tmdb.org/t/p/original${movie.backdrop}`}
+          src={
+            movie.backdrop_path
+              ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
+              : "/fallback.jpg"
+          }
           className="w-full h-[300px] object-cover"
         />
 
@@ -41,8 +90,13 @@ export default function MovieModal({ movie, onClose }: Props) {
 
           {/* BUTTONS */}
           <div className="flex gap-3 mb-6">
-            <button className="bg-gray-700 px-4 py-2 rounded">
-              + Watchlist
+            <button
+              onClick={handleWatchlist}
+              className={`px-4 py-2 rounded ${
+                added ? "bg-green-500" : "bg-gray-700"
+              }`}
+            >
+              {added ? "✓ Added" : "+ Watchlist"}
             </button>
 
             <button className="bg-white text-black px-4 py-2 rounded">
@@ -50,27 +104,22 @@ export default function MovieModal({ movie, onClose }: Props) {
             </button>
           </div>
 
-          {/* RATINGS (UI only for now) */}
-          <div className="mb-6">
-            <h3 className="font-semibold mb-2">Ratings</h3>
-            <p>Overall: ⭐⭐⭐⭐⭐</p>
-            <p>Story: ⭐⭐⭐⭐☆</p>
-            <p>Characters: ⭐⭐⭐⭐⭐</p>
-          </div>
-
           {/* GENRES */}
           <div className="mb-6">
             <h3 className="font-semibold mb-2">Genres</h3>
             <div className="flex gap-2 flex-wrap">
-              {movie.genres.map((g: any) => (
-                <span key={g.id} className="bg-gray-700 px-2 py-1 rounded text-sm">
+              {movie.genres?.map((g: any) => (
+                <span
+                  key={g.id}
+                  className="bg-gray-700 px-2 py-1 rounded text-sm"
+                >
                   {g.name}
                 </span>
               ))}
             </div>
           </div>
 
-          {/* WATCH PROVIDERS */}
+          {/* PROVIDERS */}
           <div className="mb-6">
             <h3 className="font-semibold mb-2">Available On</h3>
 
@@ -90,7 +139,7 @@ export default function MovieModal({ movie, onClose }: Props) {
             <h3 className="font-semibold mb-3">Cast</h3>
 
             <div className="grid grid-cols-4 gap-4">
-              {movie.cast.map((c: any) => (
+              {movie.cast?.map((c: any) => (
                 <div key={c.id} className="text-center">
                   <img
                     src={
@@ -98,7 +147,7 @@ export default function MovieModal({ movie, onClose }: Props) {
                         ? `https://image.tmdb.org/t/p/w200${c.profile_path}`
                         : "/fallback.jpg"
                     }
-                    className="w-full h-24 object-cover rounded"
+                    className="w-full h-25 object-cover rounded"
                   />
                   <p className="text-xs mt-1">{c.name}</p>
                 </div>
