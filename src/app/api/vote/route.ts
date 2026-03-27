@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     // 🔥 get logged-in user
     const session = await getServerSession();
 
-    if (!session?.user?.email) {
+    if (!session?.user?.email) { 
       return NextResponse.json(
         { error: "Not authenticated" },
         { status: 401 }

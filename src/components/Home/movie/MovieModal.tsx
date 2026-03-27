@@ -11,6 +11,7 @@ interface Props {
 export default function MovieModal({ movie, onClose }: Props) {
   const user = useAuthStore((state) => state.user);
   const [added, setAdded] = useState(false);
+  const [likeadded, setLikeAdded] = useState(false);
 
   const handleWatchlist = async () => {
     if (!user?.email) {
@@ -40,7 +41,6 @@ export default function MovieModal({ movie, onClose }: Props) {
         alert("Already in watchlist ⚠️");
         setAdded(true);
       } else if (res.ok) {
-        alert("Added to watchlist ✅");
         setAdded(true);
       } else {
         alert(data.error || "Something went wrong");
@@ -48,6 +48,42 @@ export default function MovieModal({ movie, onClose }: Props) {
     } catch (err) {
       console.error(err);
       alert("Error adding to watchlist");
+    }
+  };
+
+  const handleLike = async () => {
+    if (!user?.email) {
+      alert("Login first");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/likes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.email,
+          movie: {
+            id: movie.id,
+            title: movie.title,
+            poster: movie.poster_path || "",
+          },
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.error === "Already liked") {
+        setLikeAdded(true);
+        alert("Already liked ❤️");
+      } else {
+        setLikeAdded(true);
+      }
+
+    } catch (err) {
+      console.error("Like error:", err);
     }
   };
 
@@ -99,8 +135,13 @@ export default function MovieModal({ movie, onClose }: Props) {
               {added ? "✓ Added" : "+ Watchlist"}
             </button>
 
-            <button className="bg-white text-black px-4 py-2 rounded">
-              👍 Like
+            <button
+              onClick={handleLike}
+              className={`px-4 py-2 rounded ${
+                likeadded ? "bg-green-500" : "bg-gray-700"
+              }`}
+            >
+              {likeadded ? "❤️ Liked" : "Like"}
             </button>
           </div>
 

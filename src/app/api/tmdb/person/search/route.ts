@@ -1,25 +1,29 @@
 import { NextResponse } from "next/server";
-import { fetchFromTMDB } from "@/app/lib/tmdb";
 
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const query = searchParams.get("query");
-
-  if (!query) {
-    return NextResponse.json(
-      { error: "Query is required" },
-      { status: 400 }
-    );
-  }
-
   try {
-    // ✅ CORRECT endpoint
-    const data = await fetchFromTMDB(
-      `/search/person?query=${encodeURIComponent(query)}`
+    const { searchParams } = new URL(req.url);
+    const query = searchParams.get("query");
+
+    if (!query) {
+      return NextResponse.json(
+        { error: "Missing query" },
+        { status: 400 }
+      );
+    }
+
+    // ✅ CALL YOUR VERCEL PROXY (NOT TMDB DIRECTLY)
+    const res = await fetch(
+      `https://tmdb-api-xhfv.vercel.app/api/tmdb/search/person?query=${encodeURIComponent(query)}`
     );
+
+    const data = await res.json();
 
     return NextResponse.json(data);
+
   } catch (err) {
+    console.error("SEARCH API ERROR:", err);
+
     return NextResponse.json(
       { error: "Search failed" },
       { status: 500 }

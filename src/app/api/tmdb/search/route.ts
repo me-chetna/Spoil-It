@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 
-const API_KEY = process.env.TMDB_API_KEY;
-
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
@@ -14,14 +12,18 @@ export async function GET(req: Request) {
       );
     }
 
+    // ✅ USE YOUR WORKING VERCEL PROXY
     const res = await fetch(
-      `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${query}`
+      `${process.env.NEXT_PUBLIC_TMDB_PROXY_URL}/api/tmdb/search/multi?query=${encodeURIComponent(query)}`
     );
 
     const data = await res.json();
 
     return NextResponse.json(data);
+
   } catch (err) {
+    console.error("SEARCH API ERROR:", err);
+
     return NextResponse.json(
       { error: "Search failed" },
       { status: 500 }
