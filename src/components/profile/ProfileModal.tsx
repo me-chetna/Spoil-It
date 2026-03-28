@@ -6,22 +6,41 @@ import { useAuthStore } from "@/store/useAuthStore"
 
 export default function ProfileModal({ onClose }: { onClose: () => void }) {
 
-  const  user  = useAuthStore((state) => state.user)
+  const user = useAuthStore((state) => state.user)
 
-  const [avatar, setAvatar] = useState<string | null>(null) // To store the avatar URL
-  const [openAvatarModal, setOpenAvatarModal] = useState(false) //To open the avatar dialogue box
+  const [avatar, setAvatar] = useState<string | null>(null)
+  const [openAvatarModal, setOpenAvatarModal] = useState(false)
 
-  // 🔥 Set avatar from logged-in user
+  const [likeCount, setLikeCount] = useState(0) // ✅ NEW
+
+  // 🔥 Set avatar
   useEffect(() => {
     if (user?.image) {
       setAvatar(user.image)
     }
   }, [user])
 
+  // 🔥 FETCH LIKES COUNT
+  useEffect(() => {
+    if (!user?.email) return
+
+    const fetchLikes = async () => {
+      try {
+        const res = await fetch(`/api/likes?userId=${user.email}`)
+        const data = await res.json()
+
+        setLikeCount(data.length || 0) // ✅ COUNT
+      } catch (err) {
+        console.error("Like fetch error:", err)
+      }
+    }
+
+    fetchLikes()
+  }, [user])
+
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
 
-      {/* Profile Card */}
       <div className="bg-black rounded-3xl w-[600px] p-10 my-20 relative text-white">
 
         {/* Close */}
@@ -61,18 +80,19 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
 
           <div>
             <h3 className="text-lg font-semibold">Spoil-Coins</h3>
-            <p>{user?.spoilCoins ?? 0}</p> {/* 🔥 later from DB */}
+            <p>{user?.spoilCoins ?? 0}</p>
           </div>
 
+          {/* ✅ FIXED LIKE COUNT */}
           <div>
             <h3 className="text-lg font-semibold">Total series Liked</h3>
-            <p>0</p> {/* 🔥 later dynamic */}
+            <p>{likeCount}</p>
           </div>
+
         </div>
 
       </div>
 
-      {/* Avatar Selection Popup */}
       {openAvatarModal && (
         <AvatarModal
           setAvatar={setAvatar}

@@ -39,41 +39,48 @@ export default function ContentCarousel({
   const [selectedMovie, setSelectedMovie] = useState<any>(null);
 
   const openMovie = async (item: any) => {
-    try {
-      const type = item.type === "tv" ? "tv" : "movie";
+  try {
+    const type = item.type === "tv" ? "tv" : "movie";
 
-      // ✅ FIXED API PATH
-      const res = await fetch(`/api/tmdb/movie/${item.id}?type=${type}`);
-      const data = await res.json();
+    const res = await fetch(`/api/tmdb/movie/${item.id}?type=${type}`);
+    const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error("API failed");
-      }
-      
-      if (!data.details) {
-        console.error("Invalid movie data", data);
-        return;
-      }
+    console.log("API DATA:", data);
 
-      setSelectedMovie({
-        ...data.details,
-        title: data.details.title || data.details.name,
-        overview: data.details.overview,
+    // ✅ HANDLE BOTH CASES (important)
+    const details = data.details || data;
+    const credits = data.credits || {};
+    const providersData = data.providers || {};
 
-        backdrop: data.details.backdrop_path,
-
-        genres: data.details.genres || [],
-
-        providers:
-          data.providers?.results?.US?.flatrate || [],
-
-        cast: data.credits?.cast?.slice(0, 8) || [],
-      });
-
-    } catch (err) {
-      console.error("Movie fetch error:", err);
+    if (!details || !details.id) {
+      console.error("Invalid movie data", data);
+      return;
     }
-  };
+
+    setSelectedMovie({
+      ...details,
+
+      title: details.title || details.name || "No Title",
+      overview: details.overview || "No description available",
+
+      // ✅ FIX THIS (IMPORTANT)
+      backdrop_path: details.backdrop_path || "",
+
+      genres: details.genres || [],
+
+      // ✅ FIX PROVIDERS (India + fallback)
+      providers:
+        providersData?.results?.IN?.flatrate ||
+        providersData?.results?.US?.flatrate ||
+        [],
+
+      cast: credits?.cast?.slice(0, 8) || [],
+    });
+
+  } catch (err) {
+    console.error("Movie fetch error:", err);
+  }
+};
   return (
     <div className="w-full py-10" style={{ backgroundColor: bgColor }}>
       
@@ -112,7 +119,10 @@ export default function ContentCarousel({
                   key={item.id}
                   className="flex-[0_0_calc(100%/6)]"
                 >
-                  <ContentCard item={safeItem} color={color} onClick={() => openMovie(item)} />
+                  <ContentCard item={safeItem} color={color} onClick={() => {
+                    console.log("CLICKED MOVIE:", item);
+                    openMovie(item);
+                  }} />
                 </div>
               );
             })}
