@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { avatars } from '../data/avatars';
 
 interface User {
   _id: string; // ✅ ADD THIS

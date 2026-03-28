@@ -59,7 +59,7 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
           >
             {avatar ? (
               <img
-                src={user?.avatar || user?.image}
+                src={user?.image || "/fallback.jpg"}
                 className="w-full h-full object-cover"
               />
             ) : (
