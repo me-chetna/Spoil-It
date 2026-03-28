@@ -1,8 +1,7 @@
-import PollCard from "@/components/votings/PollCard"
-import { polls } from "@/data/poll"
+import PollCard from "@/components/votings/PollCard";
+import { polls } from "@/data/poll";
 
 export default function VotingPage() {
-
   return (
     <div className="p-8">
 
@@ -11,13 +10,11 @@ export default function VotingPage() {
       </h1>
 
       <div className="grid grid-cols-2 gap-6">
-
-        {polls.map(poll => (
-          <PollCard key={poll.id} poll={poll} />
+        {polls.map((poll) => (
+          <PollCard key={poll._id} poll={poll} />
         ))}
-
       </div>
 
     </div>
-  )
+  );
 }

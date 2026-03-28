@@ -2,11 +2,12 @@ export interface PollOption {
   id: string
   title: string
   image: string
-  votes: number
+  tmdbId?: number // ✅ NEW
+  rating?: number // ✅ NEW
 }
 
 export interface Poll {
-  _id: string
+  id: string
   title: string
   cost: number // coins required
   options: PollOption[]

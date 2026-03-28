@@ -1,15 +1,20 @@
+import { NextResponse } from "next/server";
 import { connectDB } from "@/app/lib/db";
-import Poll from "@/app/models/Poll";
 import User from "@/app/models/User";
-import { NextResponse } from "next/dist/server/web/spec-extension/response";
+import Poll from "@/app/models/Poll";
 
 export async function POST(req: Request) {
   await connectDB();
 
   const { pollId } = await req.json();
 
-  const poll = await Poll.findById(pollId);
+  const poll = await Poll.findOne({ pollId });
 
+  if (!poll) {
+    return NextResponse.json({ error: "Poll not found" });
+  }
+
+  // 🔥 find winning option
   const winningOption = poll.options.reduce((prev: any, curr: any) =>
     curr.votes > prev.votes ? curr : prev
   );
@@ -20,11 +25,11 @@ export async function POST(req: Request) {
 
   for (const user of users) {
     const vote = user.votedPolls.find(
-      (v: any) => v.pollId === pollId
+      (v: any) => v.pollId.toString() === pollId // ✅ FIX
     );
 
-    if (vote.optionId === winningOption.id) {
-      user.spoilCoins += 20; // 🔥 reward
+    if (vote?.optionId === winningOption.id) {
+      user.spoilCoins += 20;
       await user.save();
     }
   }

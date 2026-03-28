@@ -31,7 +31,7 @@ export async function GET(
     }
 
     return NextResponse.json({
-      details,
+      ...details,
       credits,
       providers,
     });

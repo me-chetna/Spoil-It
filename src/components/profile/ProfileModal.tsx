@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import AvatarModal from "@/components/profile/AvatarModal"
 import { useAuthStore } from "@/store/useAuthStore"
-import { avatars } from '../../data/avatars';
 
 export default function ProfileModal({ onClose }: { onClose: () => void }) {
 
@@ -62,7 +61,7 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
 
           <div>
             <h3 className="text-lg font-semibold">Spoil-Coins</h3>
-            <p>50</p> {/* 🔥 later from DB */}
+            <p>{user?.spoilCoins ?? 0}</p> {/* 🔥 later from DB */}
           </div>
 
           <div>
