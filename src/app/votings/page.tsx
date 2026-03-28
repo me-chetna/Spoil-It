@@ -11,7 +11,7 @@ export default function VotingPage() {
 
       <div className="grid grid-cols-2 gap-6">
         {polls.map((poll) => (
-          <PollCard key={poll._id} poll={poll} />
+          <PollCard key={poll.id} poll={poll} />
         ))}
       </div>
 
