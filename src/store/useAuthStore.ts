@@ -1,8 +1,7 @@
 import { create } from "zustand";
-import { avatars } from '../data/avatars';
 
 interface User {
-  _id: string; // ✅ ADD THIS
+  _id: string;
   email?: string | null;
   name?: string | null;
   image?: string | null;
@@ -13,33 +12,23 @@ interface AuthState {
   user: User | null;
   openLogin: boolean;
 
-  setUser: (user: User) => void;
+  setUser: (user: User | null) => void;
   setLoginModal: (open: boolean) => void;
   logout: () => void;
 
-  updateCoins: (coins: number) => void; // 🔥 ADD THIS
+  updateCoins: (coins: number) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   openLogin: false,
 
-  setUser: (user) =>
-    set({
-      user,
-    }),
+  setUser: (user) => set({ user }),
 
-  setLoginModal: (open) =>
-    set({
-      openLogin: open,
-    }),
+  setLoginModal: (open) => set({ openLogin: open }),
 
-  logout: () =>
-    set({
-      user: null,
-    }),
+  logout: () => set({ user: null }),
 
-  // 🔥 update coins globally
   updateCoins: (coins) =>
     set((state) => ({
       user: state.user

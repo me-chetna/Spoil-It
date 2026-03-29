@@ -9,24 +9,17 @@ export default function useSessionSync() {
   const setUser = useAuthStore((state) => state.setUser);
 
   useEffect(() => {
-    if (!session?.user?.email) return;
+    if (!session?.user) {
+      setUser(null);
+      return;
+    }
 
-    const syncUser = async () => {
-      try {
-        const res = await fetch(`/api/user?email=${session.user.email}`);
-        const data = await res.json();
-
-        if (!res.ok) {
-          console.error("Failed to fetch user");
-          return;
-        }
-
-        setUser(data); // ✅ REAL USER FROM DB
-      } catch (err) {
-        console.error("Session sync error:", err);
-      }
-    };
-
-    syncUser();
+    setUser({
+      _id: session.user.id || session.user.email || "temp-id",
+      email: session.user.email,
+      name: session.user.name,
+      image: session.user.image,
+      spoilCoins: session.user.spoilCoins || 0,
+    });
   }, [session, setUser]);
 }

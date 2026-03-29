@@ -12,20 +12,19 @@ export const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
-    // ✅ SIGN IN (CREATE USER)
     async signIn({ user }) {
       try {
         await connectDB();
 
-        if (!user?.email) return false;
+        if (!user.email) return false;
 
         const existingUser = await User.findOne({ email: user.email });
 
         if (!existingUser) {
           await User.create({
             email: user.email,
-            name: user.name || "",
-            image: user.image || "",
+            name: user.name,
+            image: user.image,
             avatar: null,
             spoilCoins: 50,
           });
@@ -38,20 +37,18 @@ export const authOptions: NextAuthOptions = {
       }
     },
 
-    // ✅ SESSION (VERY IMPORTANT FIX)
     async session({ session }) {
       try {
         await connectDB();
 
-        if (!session?.user?.email) return session;
+        if (!session.user?.email) return session;
 
         const dbUser = await User.findOne({
           email: session.user.email,
         });
 
         if (dbUser) {
-          // 🔥 attach DB fields
-          (session.user as any)._id = dbUser._id.toString();
+          (session.user as any).id = dbUser._id.toString();
           (session.user as any).avatar = dbUser.avatar;
           (session.user as any).spoilCoins = dbUser.spoilCoins;
         }
@@ -59,7 +56,7 @@ export const authOptions: NextAuthOptions = {
         return session;
       } catch (error) {
         console.log("❌ session error:", error);
-        return session; // ✅ never break session
+        return session;
       }
     },
   },
