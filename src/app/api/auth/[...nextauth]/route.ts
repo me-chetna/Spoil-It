@@ -16,7 +16,7 @@ export const authOptions: NextAuthOptions = {
       try {
         await connectDB();
 
-        if (!user.email) return false;
+        if (!user.email) return true;
 
         const existingUser = await User.findOne({ email: user.email });
 
@@ -33,7 +33,7 @@ export const authOptions: NextAuthOptions = {
         return true;
       } catch (error) {
         console.log("❌ signIn error:", error);
-        return false;
+        return true;
       }
     },
 
