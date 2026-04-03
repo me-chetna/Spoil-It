@@ -47,7 +47,6 @@ const useAuthStore = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_mo
         logout: ()=>set({
                 user: null
             }),
-        // 🔥 update coins globally
         updateCoins: (coins)=>set((state)=>({
                     user: state.user ? {
                         ...state.user,
@@ -82,12 +81,21 @@ function useSessionSync() {
     }["useSessionSync.useAuthStore[setUser]"]);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "useSessionSync.useEffect": ()=>{
-            if (session?.user) {
-                setUser(session.user);
+            if (!session?.user) {
+                setUser(null);
+                return;
             }
+            setUser({
+                _id: session.user.id || session.user.email || "temp-id",
+                email: session.user.email,
+                name: session.user.name,
+                image: session.user.image,
+                spoilCoins: session.user.spoilCoins || 0
+            });
         }
     }["useSessionSync.useEffect"], [
-        session
+        session,
+        setUser
     ]);
 }
 _s(useSessionSync, "6yzAAb1ctVRb65VqwvBo1dmffP0=", false, function() {
@@ -342,16 +350,36 @@ function ProfileModal({ onClose }) {
     const user = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$store$2f$useAuthStore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuthStore"])({
         "ProfileModal.useAuthStore[user]": (state)=>state.user
     }["ProfileModal.useAuthStore[user]"]);
-    const [avatar, setAvatar] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null) // To store the avatar URL
+    const [avatar, setAvatar] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [openAvatarModal, setOpenAvatarModal] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [likeCount, setLikeCount] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(0) // ✅ NEW
     ;
-    const [openAvatarModal, setOpenAvatarModal] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false) //To open the avatar dialogue box
-    ;
-    // 🔥 Set avatar from logged-in user
+    // 🔥 Set avatar
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "ProfileModal.useEffect": ()=>{
             if (user?.image) {
                 setAvatar(user.image);
             }
+        }
+    }["ProfileModal.useEffect"], [
+        user
+    ]);
+    // 🔥 FETCH LIKES COUNT
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "ProfileModal.useEffect": ()=>{
+            if (!user?.email) return;
+            const fetchLikes = {
+                "ProfileModal.useEffect.fetchLikes": async ()=>{
+                    try {
+                        const res = await fetch(`/api/likes?userId=${user.email}`);
+                        const data = await res.json();
+                        setLikeCount(data.length || 0); // ✅ COUNT
+                    } catch (err) {
+                        console.error("Like fetch error:", err);
+                    }
+                }
+            }["ProfileModal.useEffect.fetchLikes"];
+            fetchLikes();
         }
     }["ProfileModal.useEffect"], [
         user
@@ -368,7 +396,7 @@ function ProfileModal({ onClose }) {
                         children: "✕"
                     }, void 0, false, {
                         fileName: "[project]/src/components/profile/ProfileModal.tsx",
-                        lineNumber: 28,
+                        lineNumber: 47,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -377,28 +405,28 @@ function ProfileModal({ onClose }) {
                             onClick: ()=>setOpenAvatarModal(true),
                             className: "w-40 h-40 rounded-full bg-gray-300 overflow-hidden cursor-pointer hover:scale-105 transition flex items-center justify-center",
                             children: avatar ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
-                                src: user?.avatar || user?.image,
+                                src: user?.image || "/fallback.jpg",
                                 className: "w-full h-full object-cover"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/profile/ProfileModal.tsx",
-                                lineNumber: 42,
+                                lineNumber: 61,
                                 columnNumber: 15
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 className: "text-black",
                                 children: "No Image"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/profile/ProfileModal.tsx",
-                                lineNumber: 47,
+                                lineNumber: 66,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/profile/ProfileModal.tsx",
-                            lineNumber: 37,
+                            lineNumber: 56,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/profile/ProfileModal.tsx",
-                        lineNumber: 36,
+                        lineNumber: 55,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -411,7 +439,7 @@ function ProfileModal({ onClose }) {
                                         children: user?.name || "No name"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/profile/ProfileModal.tsx",
-                                        lineNumber: 56,
+                                        lineNumber: 75,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -419,13 +447,13 @@ function ProfileModal({ onClose }) {
                                         children: user?.email || "No email"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/profile/ProfileModal.tsx",
-                                        lineNumber: 57,
+                                        lineNumber: 76,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/profile/ProfileModal.tsx",
-                                lineNumber: 55,
+                                lineNumber: 74,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -435,21 +463,20 @@ function ProfileModal({ onClose }) {
                                         children: "Spoil-Coins"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/profile/ProfileModal.tsx",
-                                        lineNumber: 63,
+                                        lineNumber: 82,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                         children: user?.spoilCoins ?? 0
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/profile/ProfileModal.tsx",
-                                        lineNumber: 64,
+                                        lineNumber: 83,
                                         columnNumber: 13
-                                    }, this),
-                                    " "
+                                    }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/profile/ProfileModal.tsx",
-                                lineNumber: 62,
+                                lineNumber: 81,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -459,33 +486,32 @@ function ProfileModal({ onClose }) {
                                         children: "Total series Liked"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/profile/ProfileModal.tsx",
-                                        lineNumber: 68,
+                                        lineNumber: 88,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                        children: "0"
+                                        children: likeCount
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/profile/ProfileModal.tsx",
-                                        lineNumber: 69,
+                                        lineNumber: 89,
                                         columnNumber: 13
-                                    }, this),
-                                    " "
+                                    }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/profile/ProfileModal.tsx",
-                                lineNumber: 67,
+                                lineNumber: 87,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/profile/ProfileModal.tsx",
-                        lineNumber: 53,
+                        lineNumber: 72,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/profile/ProfileModal.tsx",
-                lineNumber: 25,
+                lineNumber: 44,
                 columnNumber: 7
             }, this),
             openAvatarModal && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$profile$2f$AvatarModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -493,17 +519,17 @@ function ProfileModal({ onClose }) {
                 onClose: ()=>setOpenAvatarModal(false)
             }, void 0, false, {
                 fileName: "[project]/src/components/profile/ProfileModal.tsx",
-                lineNumber: 77,
+                lineNumber: 97,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/profile/ProfileModal.tsx",
-        lineNumber: 22,
+        lineNumber: 42,
         columnNumber: 5
     }, this);
 }
-_s(ProfileModal, "c/oY7xRv3vyXEUxzB3QEMlg+iK0=", false, function() {
+_s(ProfileModal, "UbyDfQeo+MX8VJ/h1R3ATTfoisk=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$store$2f$useAuthStore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuthStore"]
     ];

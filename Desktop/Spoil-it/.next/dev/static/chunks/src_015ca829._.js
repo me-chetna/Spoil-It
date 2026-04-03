@@ -623,24 +623,27 @@ function ContentCarousel({ title, items, color, bgColor }) {
     const openMovie = async (item)=>{
         try {
             const type = item.type === "tv" ? "tv" : "movie";
-            // ✅ FIXED API PATH
             const res = await fetch(`/api/tmdb/movie/${item.id}?type=${type}`);
             const data = await res.json();
-            if (!res.ok) {
-                throw new Error("API failed");
-            }
-            if (!data.details) {
+            console.log("API DATA:", data);
+            // ✅ HANDLE BOTH CASES (important)
+            const details = data.details || data;
+            const credits = data.credits || {};
+            const providersData = data.providers || {};
+            if (!details || !details.id) {
                 console.error("Invalid movie data", data);
                 return;
             }
             setSelectedMovie({
-                ...data.details,
-                title: data.details.title || data.details.name,
-                overview: data.details.overview,
-                backdrop: data.details.backdrop_path,
-                genres: data.details.genres || [],
-                providers: data.providers?.results?.US?.flatrate || [],
-                cast: data.credits?.cast?.slice(0, 8) || []
+                ...details,
+                title: details.title || details.name || "No Title",
+                overview: details.overview || "No description available",
+                // ✅ FIX THIS (IMPORTANT)
+                backdrop_path: details.backdrop_path || "",
+                genres: details.genres || [],
+                // ✅ FIX PROVIDERS (India + fallback)
+                providers: providersData?.results?.IN?.flatrate || providersData?.results?.US?.flatrate || [],
+                cast: credits?.cast?.slice(0, 8) || []
             });
         } catch (err) {
             console.error("Movie fetch error:", err);
@@ -660,7 +663,7 @@ function ContentCarousel({ title, items, color, bgColor }) {
                 children: title
             }, void 0, false, {
                 fileName: "[project]/src/components/Home/card-carousel/Horizontalcarousel.tsx",
-                lineNumber: 80,
+                lineNumber: 87,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -675,7 +678,7 @@ function ContentCarousel({ title, items, color, bgColor }) {
                         children: "<"
                     }, void 0, false, {
                         fileName: "[project]/src/components/Home/card-carousel/Horizontalcarousel.tsx",
-                        lineNumber: 90,
+                        lineNumber: 97,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -695,26 +698,29 @@ function ContentCarousel({ title, items, color, bgColor }) {
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Home$2f$card$2d$carousel$2f$Card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                         item: safeItem,
                                         color: color,
-                                        onClick: ()=>openMovie(item)
+                                        onClick: ()=>{
+                                            console.log("CLICKED MOVIE:", item);
+                                            openMovie(item);
+                                        }
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/Home/card-carousel/Horizontalcarousel.tsx",
-                                        lineNumber: 115,
+                                        lineNumber: 122,
                                         columnNumber: 19
                                     }, this)
                                 }, item.id, false, {
                                     fileName: "[project]/src/components/Home/card-carousel/Horizontalcarousel.tsx",
-                                    lineNumber: 111,
+                                    lineNumber: 118,
                                     columnNumber: 17
                                 }, this);
                             })
                         }, void 0, false, {
                             fileName: "[project]/src/components/Home/card-carousel/Horizontalcarousel.tsx",
-                            lineNumber: 100,
+                            lineNumber: 107,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/Home/card-carousel/Horizontalcarousel.tsx",
-                        lineNumber: 99,
+                        lineNumber: 106,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -726,7 +732,7 @@ function ContentCarousel({ title, items, color, bgColor }) {
                         children: ">"
                     }, void 0, false, {
                         fileName: "[project]/src/components/Home/card-carousel/Horizontalcarousel.tsx",
-                        lineNumber: 124,
+                        lineNumber: 134,
                         columnNumber: 9
                     }, this),
                     selectedMovie && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Home$2f$movie$2f$MovieModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -734,19 +740,19 @@ function ContentCarousel({ title, items, color, bgColor }) {
                         onClose: ()=>setSelectedMovie(null)
                     }, void 0, false, {
                         fileName: "[project]/src/components/Home/card-carousel/Horizontalcarousel.tsx",
-                        lineNumber: 132,
+                        lineNumber: 142,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/Home/card-carousel/Horizontalcarousel.tsx",
-                lineNumber: 87,
+                lineNumber: 94,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/Home/card-carousel/Horizontalcarousel.tsx",
-        lineNumber: 78,
+        lineNumber: 85,
         columnNumber: 5
     }, this);
 }
