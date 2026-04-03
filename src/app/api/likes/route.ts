@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/app/lib/db";
-import Liked from "@/app/models/Like"; // ✅ use Like model
+import Liked from "@/app/models/Like";
 
 // ✅ POST (Add to likes)
 export async function POST(req: Request) {
@@ -16,58 +16,61 @@ export async function POST(req: Request) {
       );
     }
 
-    // ✅ check duplicate
     const existing = await Liked.findOne({
       userId,
       movieId: movie.id,
     });
 
     if (existing) {
-      return NextResponse.json(
-        { error: "Already liked" },
-        { status: 200 }
-      );
+      return NextResponse.json({ message: "Already liked" });
     }
 
     const item = await Liked.create({
       userId,
       movieId: movie.id,
-      title: movie.title,
-      poster: movie.poster,
+      title: movie.title || movie.name,
+      poster: movie.poster_path || movie.poster,
     });
 
     return NextResponse.json(item);
-  } catch (err) {
-    console.error("LIKE POST ERROR:", err);
+  } catch (err: any) {
+    console.error("LIKE POST ERROR:", err.message);
 
     return NextResponse.json(
-      { error: "Failed to add like" },
+      { error: err.message || "Failed to add like" },
       { status: 500 }
     );
   }
 }
 
-// ✅ DELETE (Remove from likes)
+// ✅ DELETE
 export async function DELETE(req: Request) {
   try {
     await connectDB();
 
     const { userId, movieId } = await req.json();
 
+    if (!userId || !movieId) {
+      return NextResponse.json(
+        { error: "Missing data" },
+        { status: 400 }
+      );
+    }
+
     await Liked.deleteOne({ userId, movieId });
 
     return NextResponse.json({ success: true });
-  } catch (err) {
-    console.error("LIKE DELETE ERROR:", err);
+  } catch (err: any) {
+    console.error("LIKE DELETE ERROR:", err.message);
 
     return NextResponse.json(
-      { error: "Delete failed" },
+      { error: err.message || "Delete failed" },
       { status: 500 }
     );
   }
 }
 
-// ✅ GET (Fetch likes)
+// ✅ GET
 export async function GET(req: Request) {
   try {
     await connectDB();
@@ -82,14 +85,17 @@ export async function GET(req: Request) {
       );
     }
 
+    console.log("API HIT");
+    console.log("MONGO URI:", process.env.MONGODB_URI);
+
     const items = await Liked.find({ userId });
 
     return NextResponse.json(items);
-  } catch (err) {
-    console.error("LIKE GET ERROR:", err);
+  } catch (err: any) {
+    console.error("LIKE GET ERROR:", err.message);
 
     return NextResponse.json(
-      { error: "Failed to fetch likes" },
+      { error: err.message || "Failed to fetch likes" },
       { status: 500 }
     );
   }

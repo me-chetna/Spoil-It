@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       return NextResponse.json(item);
     } catch (err) {
       return NextResponse.json(
-        { error: "Failed to add" },
+        { error: "Failed to add", errorDetails: err instanceof Error ? err.message : String(err) },
         { status: 500 }
       );
     }
@@ -79,6 +79,8 @@ export async function GET(req: Request) {
         { status: 400 }
       );
     }
+    console.log("API HIT");
+    console.log("MONGO URI:", process.env.MONGODB_URI);
 
     const items = await Watchlist.find({ userId });
 
