@@ -80,7 +80,7 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
 
           <div>
             <h3 className="text-lg font-semibold">Spoil-Coins</h3>
-            <p>{user?.spoilCoins ?? 0}</p>
+            <p>{user?.spoilCoins ?? 0}</p> //If spoilCoins is undefined, show 0
           </div>
 
           {/* ✅ FIXED LIKE COUNT */}

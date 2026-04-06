@@ -5,7 +5,7 @@ const PollSchema = new mongoose.Schema({
 
   cost: {
     type: Number,
-    default: 10,
+    default: 10, // Each vote costs 10 points
   },
 
    options: [
@@ -13,7 +13,7 @@ const PollSchema = new mongoose.Schema({
       id: String,
       votes: {
         type: Number,
-        default: 0,
+        default: 0, // Initial votes for each option is 0
       },
     },
   ],

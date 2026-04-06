@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     );
 
     if (vote?.optionId === winningOption.id) {
-      user.spoilCoins += 20;
+      user.spoilCoins += 30;
       await user.save();
     }
   }

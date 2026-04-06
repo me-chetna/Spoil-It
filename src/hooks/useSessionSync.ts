@@ -19,7 +19,7 @@ export default function useSessionSync() {
       email: session.user.email,
       name: session.user.name,
       image: session.user.image,
-      spoilCoins: session.user.spoilCoins || 0,
+      spoilCoins: session.user.spoilCoins || 50, // Default coins if not provided
     });
   }, [session, setUser]);
 }

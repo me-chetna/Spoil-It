@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     // ✅ correct answer → +20
     let isCorrect = false;
     if (optionId === correctOptionId) {
-      user.spoilCoins += 20;
+      user.spoilCoins += 30;
       isCorrect = true;
     }
 
