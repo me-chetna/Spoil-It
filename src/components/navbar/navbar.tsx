@@ -16,6 +16,7 @@ const links = [
   { name: "Community", href: "/community" },
   { name: "News", href: "/news" },
   { name: "Votings", href: "/votings" },
+  { name: "Chat-it", href: "/chat" },
 ];
 
 export default function Navbar() {
