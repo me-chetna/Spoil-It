@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/app/lib/db";
 import Liked from "@/app/models/Like";
+import { ensureContentExists } from "@/app/lib/contentHelper";
 
 // ✅ POST (Add to likes)
 export async function POST(req: Request) {
@@ -31,6 +32,9 @@ export async function POST(req: Request) {
       title: movie.title || movie.name,
       poster: movie.poster_path || movie.poster,
     });
+
+    // after validation
+    await ensureContentExists(movie.id); // 🔥 ADD THIS LINE
 
     return NextResponse.json(item);
   } catch (err: any) {
