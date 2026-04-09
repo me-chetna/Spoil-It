@@ -17,7 +17,7 @@ export async function GET(req: Request) {
     await connectDB();
 
     // 🔥 ADD 10 COINS TO ALL USERS
-    await User.updateMany({}, { $inc: { spoilCoins: 10 } });
+    await User.updateMany({}, { $inc: { spoilCoins: 30 } });
 
     console.log("✅ Weekly coins added");
 
