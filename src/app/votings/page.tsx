@@ -8,6 +8,9 @@ export default function VotingPage() {
       <h1 className="text-3xl font-bold mb-6 text-center">
         Community Votings
       </h1>
+      <p className="text-center text-gray-400 mb-12">
+        (Each vote is worth 10 points for the winning option, so choose wisely! else end up loosing points )
+      </p>
 
       <div className="grid grid-cols-2 gap-6">
         {polls.map((poll) => (
