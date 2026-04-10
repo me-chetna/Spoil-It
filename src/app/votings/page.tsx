@@ -6,10 +6,10 @@ export default function VotingPage() {
     <div className="p-8">
 
       <h1 className="text-3xl font-bold mb-6 text-center">
-        Community Votings
+        Community Poll
       </h1>
       <p className="text-center text-gray-400 mb-12">
-        (Each vote is worth 10 points for the winning option, so choose wisely! else end up loosing points )
+        (Each poll is worth 10 points for the winning option, so choose wisely! else end up loosing points )
       </p>
 
       <div className="grid grid-cols-2 gap-6">

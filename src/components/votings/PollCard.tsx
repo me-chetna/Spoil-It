@@ -76,13 +76,7 @@ export default function PollCard({ poll }: Props) {
     fetchData();
   }, [poll]);
 
-  // 🔥 SAFE CORRECT OPTION
-  const correctOptionId =
-    localOptions.length > 0
-      ? localOptions.reduce((best, curr) =>
-          (curr.rating || 0) > (best.rating || 0) ? curr : best
-        ).id
-      : null;
+  const correctOptionId = poll.correctOptionId;
 
   async function handleVote(optionId: string) {
     if (!user?.email) {
@@ -101,7 +95,6 @@ export default function PollCard({ poll }: Props) {
         body: JSON.stringify({
           pollId: poll.id,
           optionId,
-          correctOptionId,
         }),
       });
 
@@ -144,7 +137,7 @@ export default function PollCard({ poll }: Props) {
             onVote={() => handleVote(option.id)}
             disabled={!!selectedOption}
             showResults={showResults}
-            isCorrect={option.id === correctOptionId}
+            correctOptionId={correctOptionId}
           />
         ))
       )}
