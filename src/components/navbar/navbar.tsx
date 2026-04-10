@@ -77,29 +77,31 @@ export default function Navbar() {
           </button>
 
           {/* DROPDOWN */}
-          <div className="absolute right-0 mt-2 w-44 bg-zinc-900 border border-white/20 rounded-lg shadow-lg overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 z-50">
+          <div className="absolute right-0 top-full pt-2 w-44 group z-50">
+            <div className = "bg-zinc-900 border border-white/20 rounded-lg shadow-lg overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200">
 
-            <button
-              onClick={() => setOpenWatchlist(true)}
-              className="block w-full text-left px-4 py-3 text-white hover:bg-white hover:text-black"
-            >
-              Watchlist
-            </button>
+              <button
+                onClick={() => setOpenWatchlist(true)}
+                className="block w-full text-left px-4 py-3 text-white hover:bg-white hover:text-black"
+              >
+                Watchlist
+              </button>
 
-            <button
-              onClick={() => setOpenLikes(true)}
-              className="block w-full text-left px-4 py-3 text-white hover:bg-white hover:text-black"
-            >
-              Liked Movies
-            </button>
+              <button
+                onClick={() => setOpenLikes(true)}
+                className="block w-full text-left px-4 py-3 text-white hover:bg-white hover:text-black"
+              >
+                Liked Movies
+              </button>
 
-            <button
-              onClick={() => signOut()}
-              className="w-full text-left px-4 py-3 text-white hover:bg-red-500"
-            >
-              Sign Out
-            </button>
+              <button
+                onClick={() => signOut()}
+                className="w-full text-left px-4 py-3 text-white hover:bg-red-500"
+              >
+                Sign Out
+              </button>
 
+            </div>
           </div>
         </div>
 
