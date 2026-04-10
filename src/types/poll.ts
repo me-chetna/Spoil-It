@@ -10,6 +10,7 @@ export interface Poll {
   id: string
   title: string
   cost: number // coins required
+  correctOptionId: string // ID of the correct option
   options: PollOption[]
   userVotedOption?: string
 }

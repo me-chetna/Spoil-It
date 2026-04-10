@@ -8,6 +8,11 @@ const PollSchema = new mongoose.Schema({
     default: 10, // Each vote costs 10 points
   },
 
+  correctOptionId: {
+    type: String,
+    required: true, // The correct option ID is required
+  },
+
    options: [
     {
       id: String,

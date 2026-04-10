@@ -8,7 +8,7 @@ interface Props {
   onVote: () => void;
   disabled: boolean;
   showResults: boolean;
-  isCorrect: boolean;
+  correctOptionId: string;
 }
 
 export default function PollOption({
@@ -17,13 +17,13 @@ export default function PollOption({
   onVote,
   disabled,
   showResults,
-  isCorrect,
+  correctOptionId,
 }: Props) {
   return (
     <div
       className={`group flex items-center justify-between gap-4 mb-4 p-4 rounded-xl border transition-all duration-300
         ${
-          showResults && isCorrect
+          showResults && option.id === correctOptionId
             ? "bg-green-900/30 border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.4)]"
             : showResults && selected
             ? "bg-red-900/30 border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]"
@@ -70,14 +70,14 @@ export default function PollOption({
           )}
 
           {/* CORRECT */}
-          {isCorrect && (
+          {option.id === correctOptionId && (
             <span className="px-2 py-1 rounded bg-green-500/20 text-green-300 border border-green-400 font-semibold">
               ✔ Correct
             </span>
           )}
 
           {/* WRONG */}
-          {selected && !isCorrect && (
+          {selected && option.id !== correctOptionId && (
             <span className="px-2 py-1 rounded bg-red-500/20 text-red-300 border border-red-400">
               ✖ Wrong
             </span>
