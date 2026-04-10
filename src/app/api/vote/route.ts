@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/app/lib/db";
 import User from "@/app/models/User";
-import Poll from "@/app/models/Poll"; // ✅ USE DATABASE MODEL
+import Poll from "@/app/models/Poll";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function POST(req: Request) {
   try {
     await connectDB();
-
     const { pollId, optionId } = await req.json();
-
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
@@ -18,55 +16,53 @@ export async function POST(req: Request) {
     }
 
     const user = await User.findOne({ email: session.user.email });
+    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    // ❌ already voted
-    const already = user.votedPolls?.find((p: any) => p.pollId === pollId);
-    if (already) {
+    // 1. Check if already voted
+    const alreadyVoted = user.votedPolls?.some((p: any) => p.pollId === pollId);
+    if (alreadyVoted) {
       return NextResponse.json({ error: "Already voted" }, { status: 400 });
     }
 
-    // ❌ no coins
-    if (user.spoilCoins < 10) {
+    // 2. Fetch Poll from DB (Searching by the custom 'id' field)
+    const poll = await Poll.findOne({ id: pollId });
+    if (!poll) {
+      return NextResponse.json({ error: `Poll ${pollId} not found` }, { status: 404 });
+    }
+
+    // 3. Handle Coins
+    if (user.spoilCoins < (poll.cost || 10)) {
       return NextResponse.json({ error: "Not enough coins" }, { status: 400 });
     }
+    user.spoilCoins -= (poll.cost || 10);
 
-    // 🔻 subtract coins
-    user.spoilCoins -= 10;
-
-    // 🔥 GET POLL FROM DATABASE
-    const poll = await Poll.findOne({ pollId });
-
-    if (!poll) {
-      return NextResponse.json({ error: "Poll not found" }, { status: 404 });
-    }
-
-    // ✅ CHECK CORRECT ANSWER FROM DATABASE
+    // 4. Validate Answer
     const isCorrect = optionId === poll.correctOptionId;
-
     if (isCorrect) {
       user.spoilCoins += 20;
     }
 
-    // 🔥 UPDATE POLL VOTES IN DATABASE
+    // 5. Update Poll Vote Count
     const option = poll.options.find((opt: any) => opt.id === optionId);
     if (option) {
-      option.votes += 1;
+      option.votes = (option.votes || 0) + 1;
+      // Mark as modified if it's a nested array
+      poll.markModified('options');
       await poll.save();
     }
 
-    // save vote to user
+    // 6. Update User Record
     user.votedPolls.push({ pollId, optionId });
-
     await user.save();
 
     return NextResponse.json({
       coins: user.spoilCoins,
       isCorrect,
-      correctOptionId: poll.correctOptionId, // 🔥 SEND BACK
+      correctOptionId: poll.correctOptionId,
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("VOTE_ERROR:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
