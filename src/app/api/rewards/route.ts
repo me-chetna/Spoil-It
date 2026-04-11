@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
   for (const user of users) {
     const vote = user.votedPolls.find(
-      (v: any) => v.pollId.toString() === pollId // ✅ FIX
+      (v: any) => v.pollId.toString() === pollId 
     );
 
     if (vote?.optionId === winningOption.id) {

@@ -15,9 +15,12 @@ export default function PollCard({ poll }: Props) {
   const [localOptions, setLocalOptions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // 🔥 NEW STATE (IMPORTANT)
+  const [correctOptionId, setCorrectOptionId] = useState<string>("");
+
   const { user, setLoginModal, updateCoins } = useAuthStore();
 
-  // 🔥 FETCH TMDB DATA (FIXED)
+  // 🔥 FETCH TMDB DATA
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -27,7 +30,6 @@ export default function PollCard({ poll }: Props) {
               let endpoint = "";
               let isPerson = false;
 
-              // ✅ detect type (keep your logic)
               if (
                 poll.title.toLowerCase().includes("actor") ||
                 poll.title.toLowerCase().includes("actress")
@@ -41,7 +43,6 @@ export default function PollCard({ poll }: Props) {
               const res = await fetch(endpoint);
               const data = await res.json();
 
-              // ✅ FIX: handle different response shapes
               let rating = 0;
 
               if (isPerson) {
@@ -53,13 +54,11 @@ export default function PollCard({ poll }: Props) {
               return {
                 ...opt,
                 rating,
-                image: opt.image, // ✅ YOU said you'll handle image
               };
             } catch {
               return {
                 ...opt,
                 rating: 0,
-                image: opt.image || "/fallback.jpg",
               };
             }
           })
@@ -76,8 +75,6 @@ export default function PollCard({ poll }: Props) {
     fetchData();
   }, [poll]);
 
-  const correctOptionId = poll.correctOptionId;
-
   async function handleVote(optionId: string) {
     if (!user?.email) {
       setLoginModal(true);
@@ -93,7 +90,7 @@ export default function PollCard({ poll }: Props) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          pollId: poll.id,
+          pollId: poll.id, // ✅ correct
           optionId,
         }),
       });
@@ -105,8 +102,10 @@ export default function PollCard({ poll }: Props) {
         return;
       }
 
+      // ✅ IMPORTANT FIXES
       setSelectedOption(optionId);
       setShowResults(true);
+      setCorrectOptionId(data.correctOptionId); // 🔥 THIS WAS MISSING
 
       updateCoins(data.coins);
 
@@ -137,7 +136,7 @@ export default function PollCard({ poll }: Props) {
             onVote={() => handleVote(option.id)}
             disabled={!!selectedOption}
             showResults={showResults}
-            correctOptionId={correctOptionId}
+            correctOptionId={correctOptionId} // 🔥 NOW DYNAMIC
           />
         ))
       )}

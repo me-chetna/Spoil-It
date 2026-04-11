@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/app/lib/db";
 import User from "@/app/models/User";
-import Poll from "@/app/models/Poll";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { polls } from "@/data/poll"; // ✅ Import static poll data
 
 export async function POST(req: Request) {
   try {
@@ -24,41 +24,33 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Already voted" }, { status: 400 });
     }
 
-    // 2. Fetch Poll from DB (Searching by the custom 'id' field)
-    const poll = await Poll.findOne({ id: pollId });
+    // 2. ✅ Find poll from static data (not DB)
+    const poll = polls.find((p) => p.id === pollId);
     if (!poll) {
       return NextResponse.json({ error: `Poll ${pollId} not found` }, { status: 404 });
     }
 
-    // 3. Handle Coins
-    if (user.spoilCoins < (poll.cost || 10)) {
+    // 3. Handle Coins — deduct cost
+    const cost = poll.cost || 10;
+    if (user.spoilCoins < cost) {
       return NextResponse.json({ error: "Not enough coins" }, { status: 400 });
     }
-    user.spoilCoins -= (poll.cost || 10);
+    user.spoilCoins -= cost;
 
     // 4. Validate Answer
     const isCorrect = optionId === poll.correctOptionId;
     if (isCorrect) {
-      user.spoilCoins += 20;
+      user.spoilCoins += 20; // net gain: +10
     }
 
-    // 5. Update Poll Vote Count
-    const option = poll.options.find((opt: any) => opt.id === optionId);
-    if (option) {
-      option.votes = (option.votes || 0) + 1;
-      // Mark as modified if it's a nested array
-      poll.markModified('options');
-      await poll.save();
-    }
-
-    // 6. Update User Record
+    // 5. Update User Record
     user.votedPolls.push({ pollId, optionId });
     await user.save();
 
     return NextResponse.json({
       coins: user.spoilCoins,
       isCorrect,
-      correctOptionId: poll.correctOptionId,
+      correctOptionId: poll.correctOptionId, // ✅ returned to frontend
     });
 
   } catch (err) {
