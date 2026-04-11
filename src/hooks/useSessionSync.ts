@@ -15,11 +15,12 @@ export default function useSessionSync() {
     }
 
     setUser({
-      _id: session.user.id || session.user.email || "temp-id",
+      _id: (session.user as any).id || session.user.email || "temp-id",
       email: session.user.email,
       name: session.user.name,
       image: session.user.image,
-      spoilCoins: session.user.spoilCoins || 50, // Default coins if not provided
+      avatar: (session.user as any).avatar || null, // ✅ THIS WAS MISSING
+      spoilCoins: (session.user as any).spoilCoins || 50,
     });
   }, [session, setUser]);
 }
